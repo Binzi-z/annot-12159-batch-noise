@@ -1,0 +1,16 @@
+{
+  "events": [
+    {
+      "kind": "web_scan",
+      "ip": "198.51.100.23",
+      "evidence": "6 sensitive paths probed"
+    },
+    {
+      "kind": "brute_force_success",
+      "ip": "203.0.113.66",
+      "user": "batch",
+      "evidence": "14 failed then 1 success"
+    }
+  ],
+  "note": "benign look-alikes are intentionally unlabelled"
+}

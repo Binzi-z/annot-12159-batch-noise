@@ -1,0 +1,40 @@
+name: proto-guard
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  prototype-pollution:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install parser runtime
+        run: pip install tree-sitter tree-sitter-language-pack pytest
+
+      - name: Scan (full, SARIF)
+        run: python -m analyzer scan . --full --sarif proto-guard.sarif
+
+      - name: Gate on new findings
+        run: python -m analyzer gate --sarif proto-guard.sarif --baseline ci/proto-guard-baseline.json
+
+      - name: Upload SARIF
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: proto-guard.sarif
+
+# Baseline workflow:
+#   * ci/proto-guard-baseline.json holds fingerprints of accepted findings.
+#   * A PR that introduces a NEW finding fails the gate step above.
+#   * To accept current findings (only on main, after review):
+#       python -m analyzer scan . --full --sarif proto-guard.sarif
+#       python -m analyzer gate --sarif proto-guard.sarif \
+#           --baseline ci/proto-guard-baseline.json --update
+#       git add ci/proto-guard-baseline.json && git commit

@@ -3,3 +3,4 @@ __pycache__/
 .pytest_cache/
 findings.json
 report.json
+.proto-guard/
